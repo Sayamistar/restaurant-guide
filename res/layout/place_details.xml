@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/vicinity"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/rating"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView" >
+    </TextView>
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <view
+            android:id="@+id/map"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:apiKey="@string/google_maps_key"
+            class="com.google.android.maps.MapView"
+            android:clickable="true" />
+
+    </LinearLayout>
+
+</LinearLayout>

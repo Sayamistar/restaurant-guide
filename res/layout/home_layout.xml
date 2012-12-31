@@ -1,0 +1,41 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center" >
+
+    <ImageButton
+        android:id="@+id/find"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="30dp"
+        android:background="@drawable/find"
+        android:contentDescription="Find" />
+
+    <ImageButton
+        android:id="@+id/favourites"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/find"
+        android:background="@drawable/favourites"
+        android:contentDescription="Favourites" />
+
+    <TextView
+        android:id="@+id/find_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/find"
+        android:layout_below="@+id/find"
+        android:layout_marginRight="33dp"
+        android:text="Find" />
+
+    <TextView
+        android:id="@+id/favourites_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/favourites"
+        android:layout_below="@+id/favourites"
+        android:layout_marginLeft="8dp"
+        android:text="Favourites" />
+
+</RelativeLayout>

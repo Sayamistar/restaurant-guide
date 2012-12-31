@@ -1,0 +1,18 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+       <com.google.android.maps.MapView
+        android:id="@+id/mapview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:apiKey="0katdD8Epc4-ZP-liXilmm19kmXgtWaU_5-8r_A"
+        android:clickable="true" />
+  		<Button
+  		android:id="@+id/alertDialogClose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Close" 
+        android:onClick="sendMessage" />
+</LinearLayout>
