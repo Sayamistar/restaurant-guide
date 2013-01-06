@@ -1,6 +1,5 @@
 package uk.ac.aston.pyzerg.restaurantguide;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -13,6 +12,7 @@ import com.actionbarsherlock.view.MenuItem;
 public class Preferences extends SherlockActivity {
 	
 	private Spinner radiusSpinner;
+	private PreferenceManager prefs;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -45,9 +45,11 @@ public class Preferences extends SherlockActivity {
 		super.onOptionsItemSelected(item);
 		switch (item.getItemId()) {
 		case R.id.save:
+			// save the radius in application context
 			Config.RADIUS = (String) radiusSpinner.getSelectedItem();
-			Intent intent = new Intent(this, Home.class);
-			startActivity(intent);
+			prefs = new PreferenceManager(this.getApplicationContext());
+			prefs.setRadius(Config.RADIUS);
+			prefs.save();
 			break;
 		}
 

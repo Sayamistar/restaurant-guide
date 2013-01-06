@@ -12,6 +12,7 @@ import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -66,34 +67,48 @@ public class ViewResults extends SherlockActivity implements
         Intent intent = this.getIntent();
         keyword = intent.getStringExtra("keyword");
         
-        if (keyword != "") { 
-	        hrf = TouristHttpTransport.createRequestFactory();
-			Resources res = getResources();
-			try {
-				HttpRequest request = hrf.buildGetRequest(new GenericUrl(
-						res.getString(R.string.places_search_url)));
-				request.getUrl().put("key", res.getString(R.string.google_places_key));
-				request.getUrl().put("location", location);
-				request.getUrl().put("radius", Config.RADIUS);
-				request.getUrl().put("keyword", keyword);
-				request.getUrl().put("sensor", false);
-				Log.i(Config.MSGTAG, "Request: " + request.toString());
-				places = request.execute().parseAs(PlaceList.class);
-				Log.i(Config.MSGTAG, "Response: " + places.getStatus());
-				
-				List<String> titles = new ArrayList<String>(places.getResults()
-						.size());
-				for (Place p : places.getResults()) {
-					titles.add(p.toString());
+        if (keyword != "") {         	
+        	
+        	class GoogleRequest extends AsyncTask<Void, Void, Integer> {
+
+				protected Integer doInBackground(Void...params) {
+					hrf = TouristHttpTransport.createRequestFactory();
+					Resources res = getResources();
+					try {
+						HttpRequest request = hrf.buildGetRequest(new GenericUrl(
+								res.getString(R.string.places_search_url)));
+						request.getUrl().put("key", res.getString(R.string.google_places_key));
+						request.getUrl().put("location", location);
+						request.getUrl().put("radius", Config.RADIUS);
+						request.getUrl().put("keyword", keyword);
+						request.getUrl().put("sensor", false);
+						Log.i(Config.MSGTAG, "Request: " + request.toString());
+						places = request.execute().parseAs(PlaceList.class);
+						Log.i(Config.MSGTAG, "Response: " + places.getStatus());
+					} catch (IOException e) {
+						Log.e(Config.MSGTAG, e.getMessage());
+					}  
+					
+					return null;
 				}
-				ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-						R.layout.place_title, R.id.placeTitle, titles);
-				ListView l = (ListView) this.findViewById(R.id.placeList);
-				l.setAdapter(adapter);
-				l.setOnItemClickListener(this);
-			} catch (IOException e) {
-				Log.e(Config.MSGTAG, e.getMessage());
-			}
+
+				@Override
+				protected void onPostExecute(Integer result) {   
+					List<String> titles = new ArrayList<String>(places.getResults()
+							.size());
+					for (Place p : places.getResults()) {
+						titles.add(p.toString());
+					}
+					ArrayAdapter<String> adapter = new ArrayAdapter<String>(ViewResults.this,
+							R.layout.place_title, R.id.placeTitle, titles);
+					ListView l = (ListView) ViewResults.this.findViewById(R.id.placeList);
+					l.setAdapter(adapter);
+					l.setOnItemClickListener(ViewResults.this);
+			    }
+        	}	
+        	
+        	GoogleRequest googleRequest = new GoogleRequest();
+            googleRequest.execute();
         }
         else {
         	Toast.makeText(this, "No results found", Toast.LENGTH_LONG).show();

@@ -15,6 +15,8 @@ public class Home extends SherlockActivity {
 	
 	private ImageButton findButton;
 	private ImageButton favouritesButton;
+	
+	private PreferenceManager prefs;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,6 +32,10 @@ public class Home extends SherlockActivity {
 				startActivity(intent);
 			}
         });
+        
+        // retrieve preferences
+        prefs = new PreferenceManager(this.getApplicationContext());
+        Config.RADIUS = prefs.getRadius();
     }
 
 	@Override

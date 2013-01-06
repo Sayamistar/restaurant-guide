@@ -12,6 +12,7 @@ import com.google.api.client.json.jackson.JacksonFactory;
 
 public class TouristHttpTransport {
 	
+	
 	private static final HttpTransport transport = new ApacheHttpTransport();
 
 	public static HttpRequestFactory createRequestFactory() {

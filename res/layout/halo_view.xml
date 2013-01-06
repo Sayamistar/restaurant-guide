@@ -22,7 +22,7 @@
         android:layout_height="fill_parent"
         android:orientation="vertical" >
 
-        <MapView
+        <view
             android:id="@+id/halomap"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
