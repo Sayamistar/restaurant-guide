@@ -33,6 +33,16 @@ public class Home extends SherlockActivity {
 			}
         });
         
+        favouritesButton.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				Intent intent = new Intent(v.getContext(), Favourites.class);
+				startActivity(intent);
+				
+			}
+        	
+        });
+        
         // retrieve preferences
         prefs = new PreferenceManager(this.getApplicationContext());
         Config.RADIUS = prefs.getRadius();

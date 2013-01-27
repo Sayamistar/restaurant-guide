@@ -13,17 +13,14 @@ import com.actionbarsherlock.view.MenuItem;
 
 public class SelectCategory extends SherlockActivity {
 	
-	private Button coffeeShops;
-	private Button fastFoodOutlets;
-	private Button foodCourts;
-	private Button bars;
-	private Button sandwichShops;
-	private Button cuisines;
+	private Button coffeeShops, fastFoodOutlets, foodCourts, bars, sandwichShops, cuisines, cost;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.selectcategory_layout);
+        
+        this.setTitle("Select Category");
         
         coffeeShops = (Button) findViewById(R.id.coffeeShops);
         fastFoodOutlets = (Button) findViewById(R.id.fastFoodOutlets);
@@ -31,6 +28,7 @@ public class SelectCategory extends SherlockActivity {
         bars = (Button) findViewById(R.id.bars);
         sandwichShops = (Button) findViewById(R.id.sandwichShops);
         cuisines = (Button) findViewById(R.id.cuisines);
+        cost = (Button) findViewById(R.id.cost);
         
         coffeeShops.setOnClickListener(new OnClickListener() {
 
@@ -78,6 +76,15 @@ public class SelectCategory extends SherlockActivity {
         	
         });
         cuisines.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				Intent intent = new Intent(SelectCategory.this, SelectCuisines.class);
+				startActivity(intent);
+			}
+        	
+        });
+        
+        cost.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
 				//

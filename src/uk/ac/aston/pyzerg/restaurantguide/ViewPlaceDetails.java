@@ -2,6 +2,7 @@ package uk.ac.aston.pyzerg.restaurantguide;
 
 import java.util.List;
 
+import uk.ac.aston.pyzer.restaurantguide.model.FavouritesList;
 import uk.ac.aston.pyzer.restaurantguide.model.Place;
 import uk.ac.aston.pyzer.restaurantguide.model.PlaceDetail;
 import android.content.Intent;
@@ -13,7 +14,11 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockMapActivity;
 import com.google.android.maps.GeoPoint;
@@ -23,6 +28,7 @@ import com.google.android.maps.Overlay;
 
 public class ViewPlaceDetails extends SherlockMapActivity {
 	private GeoPoint gp;
+	private Place place;
 
 	class MapOverlay extends com.google.android.maps.Overlay {
 		@Override
@@ -56,7 +62,7 @@ public class ViewPlaceDetails extends SherlockMapActivity {
 		setContentView(R.layout.place_details);
 		Intent i = this.getIntent();
 		Bundle extras = i.getExtras();
-		Place place = extras != null ? (Place) extras.getSerializable("place")
+		place = extras != null ? (Place) extras.getSerializable("place")
 				: null;
 		PlaceDetail placeDetail = PlaceDetail.getPlaceDetail(place,
 				this.getResources());
@@ -68,6 +74,36 @@ public class ViewPlaceDetails extends SherlockMapActivity {
 				+ placeDetail.getResult().getFormatted_phone_number());
 		TextView rating = (TextView) this.findViewById(R.id.rating);
 		rating.setText("Rating: " + placeDetail.getResult().getRating());
+		
+		//////////////////////////////////////////////
+		
+		Button savePlace = (Button) this.findViewById(R.id.savePlace);
+		
+		savePlace.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				
+				boolean match = false;
+				
+				for (Place p : FavouritesList.getInstance().getPlaces()) {
+					if (p.getName().equals(place.getName())) {
+						match = true;
+						break;
+					}
+				}
+				
+				if (!match) {
+					FavouritesList.getInstance().getPlaces().add(place);
+					Intent intent = new Intent(v.getContext(), Favourites.class);
+					startActivity(intent);
+				}
+				else {
+					Toast.makeText(v.getContext(), "Already saved", Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
+		
+		////////////////////////////////////////////
 
 		MapView mv = (MapView) this.findViewById(R.id.map);
 		mv.setSatellite(false);

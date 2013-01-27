@@ -1,0 +1,69 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:gravity="center" >
+    
+    <LinearLayout
+        android:id="@+id/selectedcuisines_checkboxes"
+    	android:layout_width="wrap_content"
+    	android:layout_height="wrap_content"
+    	android:orientation="vertical" >
+
+	<CheckBox
+        android:id="@+id/selectcuisines_all"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="All" />
+        
+    <CheckBox
+        android:id="@+id/selectcuisines_chinese"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chinese" />
+
+    <CheckBox
+        android:id="@+id/selectcuisines_indian"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Indian" />
+
+    <CheckBox
+        android:id="@+id/selectcuisines_italian"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Italian" />
+
+    <CheckBox
+        android:id="@+id/selectcuisines_british"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="British" />
+
+    <CheckBox
+        android:id="@+id/selectcuisines_french"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="French" />
+
+    <CheckBox
+        android:id="@+id/selectcuisines_sushi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sushi" />
+
+    <CheckBox
+        android:id="@+id/selectcuisines_mexican"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mexican" />
+    </LinearLayout>
+    
+    <Button
+        android:id="@+id/selectcuisines_search"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+       	android:text="Search" />
+
+</LinearLayout>

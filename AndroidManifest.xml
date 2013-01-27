@@ -28,9 +28,13 @@
         </activity>
         <activity android:name=".SelectCategory" >
         </activity>
+        <activity android:name=".SelectCuisines" >
+        </activity>
         <activity android:name=".ViewPlaceDetails" >
         </activity>
         <activity android:name=".HaloView" >
+        </activity>
+        <activity android:name=".Favourites" >
         </activity>
 
         <uses-library android:name="com.google.android.maps" />
