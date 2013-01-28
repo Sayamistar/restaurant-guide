@@ -17,8 +17,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockMapActivity;
 import com.google.android.maps.GeoPoint;
@@ -30,6 +30,9 @@ public class ViewPlaceDetails extends SherlockMapActivity {
 	private GeoPoint gp;
 	private Place place;
 
+	private ImageView alreadyFavourite;
+	private Button savePlace;
+	
 	class MapOverlay extends com.google.android.maps.Overlay {
 		@Override
 		public boolean draw(Canvas canvas, MapView mapView, boolean shadow,
@@ -75,34 +78,50 @@ public class ViewPlaceDetails extends SherlockMapActivity {
 		TextView rating = (TextView) this.findViewById(R.id.rating);
 		rating.setText("Rating: " + placeDetail.getResult().getRating());
 		
-		//////////////////////////////////////////////
+		// hide the favourite info until we know what to display
+		alreadyFavourite = (ImageView) findViewById(R.id.alreadyFavourite);
+		alreadyFavourite.setVisibility(View.GONE);
+		savePlace = (Button) this.findViewById(R.id.savePlace);
+		savePlace.setVisibility(View.GONE);
 		
-		Button savePlace = (Button) this.findViewById(R.id.savePlace);
+		boolean isFavourite = false;
 		
-		savePlace.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				
-				boolean match = false;
-				
-				for (Place p : FavouritesList.getInstance().getPlaces()) {
-					if (p.getName().equals(place.getName())) {
-						match = true;
-						break;
-					}
-				}
-				
-				if (!match) {
-					FavouritesList.getInstance().getPlaces().add(place);
-					Intent intent = new Intent(v.getContext(), Favourites.class);
-					startActivity(intent);
-				}
-				else {
-					Toast.makeText(v.getContext(), "Already saved", Toast.LENGTH_SHORT).show();
-				}
+		// check if the active place is in favourites list
+		// if it is, show the favourites icon
+		for (Place p : FavouritesList.getInstance().getPlaces()) {
+			if (p.getName().equals(place.getName())) {
+				isFavourite = true;
+				alreadyFavourite.setVisibility(View.VISIBLE);
+				break;
 			}
-		});
+		}
 		
+		// if the active place is not in the favourites list
+		// display the save button only
+		if (!isFavourite) { 
+			savePlace.setVisibility(View.VISIBLE);
+			
+			savePlace.setOnClickListener(new OnClickListener() {
+
+				public void onClick(View v) {
+					// add the item to the favourites list
+					FavouritesList.getInstance().getPlaces().add(place);
+					// hide the save button and show the already favourite icon
+					savePlace.setVisibility(View.GONE);
+					alreadyFavourite.setVisibility(View.VISIBLE);
+					
+					alreadyFavourite.setOnClickListener(new OnClickListener() {
+
+						public void onClick(View v) {
+							Intent intent = new Intent(v.getContext(), Favourites.class);
+							startActivity(intent);
+						}
+						
+					});
+				}
+			});
+		}
+
 		////////////////////////////////////////////
 
 		MapView mv = (MapView) this.findViewById(R.id.map);
@@ -131,5 +150,11 @@ public class ViewPlaceDetails extends SherlockMapActivity {
 	@Override
 	protected boolean isRouteDisplayed() {
 		return false;
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		
 	}
 }

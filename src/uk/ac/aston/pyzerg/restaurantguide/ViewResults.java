@@ -49,6 +49,8 @@ public class ViewResults extends SherlockActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.results);
 		
+		this.setTitle("Results");
+		
 		Button plotAllButton = (Button) this.findViewById(R.id.plot);
 		plotAllButton.setOnClickListener(this);
 

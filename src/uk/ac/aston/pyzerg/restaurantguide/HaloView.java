@@ -33,6 +33,8 @@ public class HaloView extends SherlockMapActivity implements OnClickListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.halo_view);
+		
+		this.setTitle("Location");
 		itemizedOverlay = null;
 		
 		// find the UI components
