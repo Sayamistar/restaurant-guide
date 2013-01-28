@@ -22,6 +22,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
@@ -40,6 +41,8 @@ public class ViewResults extends SherlockActivity implements
 	
 	private String keyword;
 	
+	private TextView loading;
+	
     private LocationManager locationManager;
     private Location currentLocation;
 
@@ -53,6 +56,8 @@ public class ViewResults extends SherlockActivity implements
 		
 		Button plotAllButton = (Button) this.findViewById(R.id.plot);
 		plotAllButton.setOnClickListener(this);
+		
+		loading = (TextView) this.findViewById(R.id.loading);
 
 		/* Use the LocationManager class to obtain GPS locations */
         // set up location manager to work with GPS
@@ -86,6 +91,34 @@ public class ViewResults extends SherlockActivity implements
 						request.getUrl().put("sensor", false);
 						Log.i(Config.MSGTAG, "Request: " + request.toString());
 						places = request.execute().parseAs(PlaceList.class);
+
+						 if (places.getNext_page_token() != null || places.getNext_page_token() != "") {
+				    
+							 try {
+									Thread.sleep(2000);
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+				           
+				                request.getUrl().put("pagetoken", places.getNext_page_token());
+				                PlaceList temp = request.execute().parseAs(PlaceList.class);
+				                places.getResults().addAll(temp.getResults());
+
+				                if (temp.getNext_page_token() != null || temp.getNext_page_token() != "") {
+				                    try {
+										Thread.sleep(2000);
+									} catch (InterruptedException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+				                    request.getUrl().put("pagetoken",temp.getNext_page_token());
+				                    PlaceList tempList =  request.execute().parseAs(PlaceList.class);
+				                    places.getResults().addAll(tempList.getResults());
+				                }
+				            }
+					
+
 						Log.i(Config.MSGTAG, "Response: " + places.getStatus());
 					} catch (IOException e) {
 						Log.e(Config.MSGTAG, e.getMessage());
@@ -95,19 +128,25 @@ public class ViewResults extends SherlockActivity implements
 				}
 
 				@Override
-				protected void onPostExecute(Integer result) {   
+				protected void onPostExecute(Integer result) {
+					loading.setVisibility(View.GONE);
 					List<String> titles = new ArrayList<String>(places.getResults()
 							.size());
 					for (Place p : places.getResults()) {
 						titles.add(p.toString());
+						
 					}
 					ArrayAdapter<String> adapter = new ArrayAdapter<String>(ViewResults.this,
 							R.layout.place_title, R.id.placeTitle, titles);
 					ListView l = (ListView) ViewResults.this.findViewById(R.id.placeList);
 					l.setAdapter(adapter);
 					l.setOnItemClickListener(ViewResults.this);
-			    }
+						
+					Toast.makeText(getApplicationContext(), places.getResults().size() + " results", Toast.LENGTH_LONG).show();
+					}
+        	
         	}	
+	
         	
         	GoogleRequest googleRequest = new GoogleRequest();
             googleRequest.execute();

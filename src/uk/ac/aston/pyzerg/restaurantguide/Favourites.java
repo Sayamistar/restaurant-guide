@@ -6,6 +6,7 @@ import java.util.List;
 import uk.ac.aston.pyzer.restaurantguide.model.FavouritesList;
 import uk.ac.aston.pyzer.restaurantguide.model.Place;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +36,7 @@ public class Favourites extends SherlockActivity implements OnItemClickListener 
 		setContentView(R.layout.favourites_layout);
 
 		this.setTitle("Favourites");
-
+		
 		showDeleteButton = false;
 		
 		noFavourites = (TextView) findViewById(R.id.favouritesList_noFavourites);
@@ -121,6 +122,7 @@ public class Favourites extends SherlockActivity implements OnItemClickListener 
 				showDeleteButton = true;
 				deleteFavourite.setVisible(true);
 				removePosition = position;
+				v.setBackgroundColor(Color.YELLOW);
 				return false;
 			}
 

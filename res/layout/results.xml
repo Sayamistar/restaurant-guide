@@ -8,6 +8,12 @@
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:text="Plot All" />	
+	    
+	<TextView
+	    android:id="@+id/loading"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="Loading..." />
 
 	<ListView android:layout_height="wrap_content" android:id="@+id/placeList"
 		android:layout_width="match_parent"></ListView>

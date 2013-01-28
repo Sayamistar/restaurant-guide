@@ -16,6 +16,17 @@ public class PlaceList implements Serializable {
 
 	@Key
 	private List<Place> results;
+	
+	@Key
+	private String next_page_token;
+
+	public String getNext_page_token() {
+		return next_page_token;
+	}
+
+	public void setNext_page_token(String next_page_token) {
+		this.next_page_token = next_page_token;
+	}
 
 	public String getStatus() {
 		return status;
@@ -32,5 +43,6 @@ public class PlaceList implements Serializable {
 	public void setResults(List<Place> results) {
 		this.results = results;
 	}
+	
 
 }
