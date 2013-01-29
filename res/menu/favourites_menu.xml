@@ -7,6 +7,13 @@
         android:icon="@drawable/ic_action_delete"
         android:showAsAction="ifRoom"
         android:title="Remove"/>
+    
+    <item
+        android:id="@+id/edit_favourite"
+        style="@style/Theme.Sherlock"
+        android:icon="@drawable/ic_action_edit"
+        android:showAsAction="ifRoom"
+        android:title="Edit Favourites List" />
 
 	<item
         android:id="@+id/preferences"

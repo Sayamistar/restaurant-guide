@@ -11,8 +11,11 @@
         android:layout_height="wrap_content" 
         android:text="No favourites"/>
     
-    <ListView android:layout_height="wrap_content" android:id="@+id/placeList"
-		android:layout_width="match_parent"></ListView>
+    <ListView 
+        android:id="@+id/placeList"
+        android:layout_height="wrap_content" 
+		android:layout_width="match_parent"
+		android:choiceMode="multipleChoice" />
   
 
 </LinearLayout>

@@ -1007,6 +1007,7 @@ containing a value of this type.
         public static final int cuisines=0x7f04004f;
         public static final int delete_favourite=0x7f04005d;
         public static final int disableHome=0x7f040009;
+        public static final int edit_favourite=0x7f04005e;
         public static final int edit_query=0x7f040027;
         public static final int fastFoodOutlets=0x7f04004b;
         public static final int favourites=0x7f04003b;
@@ -1030,12 +1031,12 @@ containing a value of this type.
         public static final int placeList=0x7f040035;
         public static final int placeTitle=0x7f040045;
         public static final int plot=0x7f040048;
-        public static final int preferences=0x7f04005e;
+        public static final int preferences=0x7f04005f;
         public static final int radius_label=0x7f040046;
         public static final int radius_spinner=0x7f040047;
         public static final int rating=0x7f040040;
         public static final int sandwichShops=0x7f04004e;
-        public static final int save=0x7f04005f;
+        public static final int save=0x7f040060;
         public static final int savePlace=0x7f040041;
         public static final int selectcuisines_all=0x7f040052;
         public static final int selectcuisines_british=0x7f040056;
@@ -1087,13 +1088,14 @@ containing a value of this type.
         public static final int home_layout=0x7f030019;
         public static final int place_details=0x7f03001a;
         public static final int place_title=0x7f03001b;
-        public static final int preferences_layout=0x7f03001c;
-        public static final int results=0x7f03001d;
-        public static final int selectcategory_layout=0x7f03001e;
-        public static final int selectcuisines_layout=0x7f03001f;
-        public static final int sherlock_spinner_dropdown_item=0x7f030020;
-        public static final int sherlock_spinner_item=0x7f030021;
-        public static final int viewmap_layout=0x7f030022;
+        public static final int place_title_checked=0x7f03001c;
+        public static final int preferences_layout=0x7f03001d;
+        public static final int results=0x7f03001e;
+        public static final int selectcategory_layout=0x7f03001f;
+        public static final int selectcuisines_layout=0x7f030020;
+        public static final int sherlock_spinner_dropdown_item=0x7f030021;
+        public static final int sherlock_spinner_item=0x7f030022;
+        public static final int viewmap_layout=0x7f030023;
     }
     public static final class menu {
         public static final int favourites_menu=0x7f0b0000;
