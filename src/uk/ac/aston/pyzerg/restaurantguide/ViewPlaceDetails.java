@@ -4,10 +4,12 @@ import java.util.List;
 
 import uk.ac.aston.pyzer.restaurantguide.model.FavouritePlace;
 import uk.ac.aston.pyzer.restaurantguide.model.FavouritesList;
+import uk.ac.aston.pyzer.restaurantguide.model.MyCurrentLocationOverlay;
+import uk.ac.aston.pyzer.restaurantguide.model.MyOverlayItem;
+import uk.ac.aston.pyzer.restaurantguide.model.MyPlaceOverlayItem;
 import uk.ac.aston.pyzer.restaurantguide.model.Place;
 import uk.ac.aston.pyzer.restaurantguide.model.PlaceDetail;
-import uk.ac.aston.pyzer.restaurantguide.model.PlaceItemizedOverlay;
-import uk.ac.aston.pyzer.restaurantguide.model.PlaceOverlayItem;
+import uk.ac.aston.pyzer.restaurantguide.model.PlaceOverlay;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,7 +20,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -31,20 +32,26 @@ import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
-import com.google.android.maps.OverlayItem;
 
 public class ViewPlaceDetails extends SherlockMapActivity implements
 		LocationListener {
-	private GeoPoint gp;
+
+	private static final int DEFAULT_ZOOM = 15;
+	private MapView mapView;
+	private MapController mapController;
+	private LocationManager locationManager;
+
 	private Place place;
 	private PlaceDetail placeDetail;
+
+	private List<Overlay> mapOverlays;
+	private PlaceOverlay placeOverlay;
+	private MyCurrentLocationOverlay myCurrentLocationOverlay;
 
 	private ImageView alreadyFavourite;
 
 	private Button sendToFriend;
 	private Button savePlace;
-	private LocationManager locationManager;
-	private Location currentLocation;
 
 	private boolean isFavourite = false;
 
@@ -55,12 +62,21 @@ public class ViewPlaceDetails extends SherlockMapActivity implements
 
 		// set up location manager to work with GPS
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
-				0, this);
 
-		// get the current location (or last known) from the location manager
-		currentLocation = locationManager
-				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		mapView = (MapView) this.findViewById(R.id.map);
+
+		Drawable myCurrentMarker = this.getResources().getDrawable(
+				R.drawable.my_pin_red);
+		Drawable placeMarker = this.getResources().getDrawable(
+				R.drawable.my_pin);
+
+		myCurrentLocationOverlay = new MyCurrentLocationOverlay(
+				myCurrentMarker, mapView);
+		placeOverlay = new PlaceOverlay(placeMarker, mapView);
+		mapOverlays = mapView.getOverlays();
+		mapController = mapView.getController();
+
+		mapView.setBuiltInZoomControls(true);
 
 		Intent i = this.getIntent();
 		Bundle extras = i.getExtras();
@@ -103,114 +119,79 @@ public class ViewPlaceDetails extends SherlockMapActivity implements
 		});
 
 		checkFavourites();
-
-		createMapOverlays();
 	}
 
-	private void createMapOverlays() {
-		MapView mv = (MapView) this.findViewById(R.id.map);
-		mv.setSatellite(false);
-		// mv.setTraffic(true);
-		mv.setBuiltInZoomControls(true);
+	private void animateToPlaceOnMap(final GeoPoint geopoint) {
+		mapView.post(new Runnable() {
 
-		gp = placeDetail.getResult().getGeoPoint();
-		int maxZoom = mv.getMaxZoomLevel();
-		int initZoom = (int) (0.90 * (double) maxZoom);
-
-		MapController mc = mv.getController();
-		mc.setZoom(initZoom);
-		mc.animateTo(gp);
-		mc.setCenter(gp);
-
-		Drawable restaurantIcon = this.getResources().getDrawable(
-				R.drawable.ic_launcher);
-
-		Drawable youAreHere = this.getResources().getDrawable(
-				R.drawable.red_pushpin);
-
-		PlaceItemizedOverlay placeItemizedOverlay = new PlaceItemizedOverlay(
-				restaurantIcon, this);
-		
-		//placeItemizedOverlay.setCenter(gp);
-		PlaceOverlayItem placeOverlayItem = new PlaceOverlayItem(place);
-
-		// get current position
-		double lati = 0;
-		double longi = 0;
-
-		if (currentLocation != null) {
-
-			lati = currentLocation.getLatitude();
-			longi = currentLocation.getLongitude();
-
-		}
-
-		GeoPoint point = createGeoPoint(lati, longi);
-
-		CustomItemizedOverlay customItemizedOverlay = new CustomItemizedOverlay(
-				youAreHere, this);
-
-		OverlayItem currentLocation = new OverlayItem(point, "You are here!",
-				"Lat: " + lati + "\nLong: " + longi);
-
-		// now set up the overlays
-		List<Overlay> mapOverlays = mv.getOverlays();
-
-		placeItemizedOverlay.addOverlay(placeOverlayItem);
-		customItemizedOverlay.addOverlay(currentLocation);
-		
-		mapOverlays.add(placeItemizedOverlay);
-		mapOverlays.add(customItemizedOverlay);
-
-		mv.invalidate();
-		
-		Log.i(Config.MSGTAG, "Got back: " + placeDetail.getResult());
+			@Override
+			public void run() {
+				mapView.invalidate();
+				mapController.animateTo(geopoint);
+				mapController.setZoom(DEFAULT_ZOOM);
+			}
+		});
 	}
 
-	@Override
-	protected boolean isRouteDisplayed() {
-		return false;
+	private void setCurrentGeopoint(double myLatitude, double myLongitude) {
+		final GeoPoint myCurrentGeoPoint = new GeoPoint(
+				(int) (myLatitude * 1E6), (int) (myLongitude * 1E6));
+
+		MyOverlayItem myCurrentItem = new MyOverlayItem(myCurrentGeoPoint,
+				"Current Location");
+		myCurrentLocationOverlay.addOverlay(myCurrentItem);
+		mapOverlays.add(myCurrentLocationOverlay);
+
+		animateToPlaceOnMap(myCurrentGeoPoint);
 	}
 
 	public static GeoPoint createGeoPoint(double lati, double longi) {
 		return new GeoPoint((int) (lati * 1E6), (int) (longi * 1E6));
 	}
 
-	/**
-	 * When the activity starts up, request updates
-	 */
 	@Override
-	protected void onResume() {
-		super.onResume();
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
-				0, this);
+	public void onLocationChanged(Location location) {
 
-		// re-check whether place is in favourites
-		checkFavourites();
+		locationManager.removeUpdates(this);
+
+		double myLatitude = location.getLatitude();
+		double myLongitude = location.getLongitude();
+
+		setCurrentGeopoint(myLatitude, myLongitude);
+
+		displayPlacesOnMap();
 	}
 
-	/**
-	 * When the activity is paused, stop listening for updates
-	 */
 	@Override
 	protected void onPause() {
 		super.onPause();
-		// locationManager.removeUpdates(this);
-	}
-
-	public void onLocationChanged(Location arg0) {
-		// currentLocation = arg0;
-		// createMapOverlays();
+		locationManager.removeUpdates(this);
 
 	}
 
-	public void onProviderDisabled(String arg0) {
+	@Override
+	protected void onResume() {
+		super.onResume();
+		locationManager.requestLocationUpdates(
+				LocationManager.NETWORK_PROVIDER, 5000, 100, this);
+
 	}
 
-	public void onProviderEnabled(String arg0) {
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
 	}
 
-	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
+	@Override
+	public void onProviderEnabled(String provider) {
+	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
+	}
+
+	@Override
+	protected boolean isRouteDisplayed() {
+		return false;
 	}
 
 	private void checkFavourites() {
@@ -236,33 +217,46 @@ public class ViewPlaceDetails extends SherlockMapActivity implements
 			savePlace.setOnClickListener(new OnClickListener() {
 
 				public void onClick(View v) {
-					
-					AlertDialog.Builder alert = new AlertDialog.Builder(ViewPlaceDetails.this);
+
+					AlertDialog.Builder alert = new AlertDialog.Builder(
+							ViewPlaceDetails.this);
 
 					alert.setTitle("Added to favourites!");
 					alert.setMessage("Add some notes too:");
 
-					// Set an EditText view to get user input 
+					// Set an EditText view to get user input
 					final EditText input = new EditText(ViewPlaceDetails.this);
 					alert.setView(input);
 
-					alert.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString();
-						// add the item to the favourites list
-						FavouritesList.getInstance().getPlaces().add(new FavouritePlace(place, value));
-					  }
-					});
+					alert.setPositiveButton("Save",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int whichButton) {
+									String value = input.getText().toString();
+									// add the item to the favourites list
+									FavouritesList
+											.getInstance()
+											.getPlaces()
+											.add(new FavouritePlace(place,
+													value));
+								}
+							});
 
-					alert.setNegativeButton("Ignore", new DialogInterface.OnClickListener() {
-					  public void onClick(DialogInterface dialog, int whichButton) {
-						  // add the item to the favourites list
-						  FavouritesList.getInstance().getPlaces().add(new FavouritePlace(place, "None"));
-					  }
-					});
+					alert.setNegativeButton("Ignore",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int whichButton) {
+									// add the item to the favourites list
+									FavouritesList
+											.getInstance()
+											.getPlaces()
+											.add(new FavouritePlace(place,
+													"None"));
+								}
+							});
 
 					alert.show();
-					
+
 					// hide the save button and show the already favourite icon
 					ViewPlaceDetails.this.isFavourite = true;
 					savePlace.setVisibility(View.GONE);
@@ -270,5 +264,27 @@ public class ViewPlaceDetails extends SherlockMapActivity implements
 				}
 			});
 		}
+	}
+
+	private void displayPlacesOnMap() {
+		mapOverlays.remove(placeOverlay);
+
+		GeoPoint point = null;
+		MyPlaceOverlayItem overlayitem = null;
+		placeOverlay.clear();
+
+		point = place.getGeoPoint();
+		overlayitem = new MyPlaceOverlayItem(point, place);
+		placeOverlay.addOverlay(overlayitem);
+
+		placeOverlay.calculateItems();
+
+		placeOverlay.doPopulate();
+
+		if (placeOverlay.size() > 0) {
+			mapOverlays.add(placeOverlay);
+			mapView.postInvalidate();
+		}
+
 	}
 }

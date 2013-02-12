@@ -13,7 +13,7 @@ import com.actionbarsherlock.view.MenuItem;
 
 public class SelectCategory extends SherlockActivity {
 	
-	private Button coffeeShops, fastFoodOutlets, foodCourts, bars, sandwichShops, cuisines, cost;
+	private Button coffeeShops, fastFoodOutlets, foodCourts, bars, sandwichShops, cuisines;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

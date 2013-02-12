@@ -92,7 +92,7 @@ public class ViewResults extends SherlockActivity implements
 						Log.i(Config.MSGTAG, "Request: " + request.toString());
 						places = request.execute().parseAs(PlaceList.class);
 
-						 if (places.getNext_page_token() != null || places.getNext_page_token() != "") {
+						 /*if (places.getNext_page_token() != null || places.getNext_page_token() != "") {
 				    
 							 try {
 									Thread.sleep(2000);
@@ -116,7 +116,7 @@ public class ViewResults extends SherlockActivity implements
 				                    PlaceList tempList =  request.execute().parseAs(PlaceList.class);
 				                    places.getResults().addAll(tempList.getResults());
 				                }
-				            }
+				            }*/
 					
 
 						Log.i(Config.MSGTAG, "Response: " + places.getStatus());
