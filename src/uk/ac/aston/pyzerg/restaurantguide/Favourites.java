@@ -3,11 +3,11 @@ package uk.ac.aston.pyzerg.restaurantguide;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.ac.aston.pyzer.restaurantguide.model.FavouritePlace;
 import uk.ac.aston.pyzer.restaurantguide.model.FavouritesList;
 import uk.ac.aston.pyzer.restaurantguide.model.Place;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.AdapterView;
@@ -26,9 +26,12 @@ public class Favourites extends SherlockActivity implements OnItemClickListener 
 	private TextView noFavourites;
 	
 	private boolean editMode;
+	private boolean emptyList;
 	private MenuItem editButton;
 	private MenuItem deleteButton;
+	
 	private ListView placeList;
+	
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -45,13 +48,14 @@ public class Favourites extends SherlockActivity implements OnItemClickListener 
 		editMode = getIntent().getBooleanExtra("editMode", false);
 		placeList = (ListView) Favourites.this.findViewById(R.id.placeList);
 
-		showFavourites(editMode);
+		// if there are no favourites, we need to know whether to display edit button
+		if (showFavourites(editMode) == 0) { emptyList = true; }
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		showFavourites(editMode);
+		if (showFavourites(editMode) == 0) { emptyList = true; }
 	}
 
 	@Override
@@ -62,26 +66,22 @@ public class Favourites extends SherlockActivity implements OnItemClickListener 
 		deleteButton = (MenuItem) menu.findItem(R.id.delete_favourite);
 		editButton = (MenuItem) menu.findItem(R.id.edit_favourite);
 		
+		// if there are no favourites, we don't want to display the edit button
+		if (emptyList) { 
+			editButton.setVisible(false);
+		}
+		
 		// if we are not in "edit mode", make sure delete button is not active
 		// if we are in "edit mode", make sure it is active, and remove the edit button
 		if (!editMode) { 
 			deleteButton.setVisible(false);
-			deleteButton.setEnabled(false);
 		}
 		else {
 			deleteButton.setVisible(true);
-			deleteButton.setEnabled(true);
-			
 			editButton.setVisible(false);
-			editButton.setEnabled(false);
 			
 			this.setTitle("Edit Mode");
 		}
-	
-		/*deleteFavourite = menu.findItem(R.id.delete_favourite);
-		if (!showDeleteButton) {
-			deleteFavourite.setVisible(false);
-		}*/
 
 		return true;
 	}
@@ -132,22 +132,22 @@ public class Favourites extends SherlockActivity implements OnItemClickListener 
 	}
 
 	public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-		Place p = FavouritesList.getInstance().getPlaces().get(position);
+		Place p = FavouritesList.getInstance().getPlaces().get(position).getPlace();
 		Intent i = new Intent(this, ViewPlaceDetails.class);
 		i.putExtra("place", p);
 		startActivity(i);
 	}
 
-	private void showFavourites(boolean editMode) {
+	private int showFavourites(boolean editMode) {
 		placeList.setAdapter(null);
 		placeList.invalidate();
 
 		List<String> titles = new ArrayList<String>(FavouritesList
 				.getInstance().getPlaces().size());
-		for (Place p : FavouritesList.getInstance().getPlaces()) {
-			titles.add(p.toString());
+		for (FavouritePlace fp : FavouritesList.getInstance().getPlaces()) {
+			titles.add(fp.toString());
 		}
-		
+
 		// if there are no results, show the textview
 		if (titles.size() == 0) {
 			noFavourites.setVisibility(View.VISIBLE);
@@ -165,6 +165,8 @@ public class Favourites extends SherlockActivity implements OnItemClickListener 
 			placeList.setOnItemClickListener(Favourites.this);
 		}
 		placeList.setAdapter(adapter);
+		
+		return titles.size();
 
 	}
 }

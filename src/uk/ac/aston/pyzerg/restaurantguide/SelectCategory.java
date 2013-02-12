@@ -28,7 +28,6 @@ public class SelectCategory extends SherlockActivity {
         bars = (Button) findViewById(R.id.bars);
         sandwichShops = (Button) findViewById(R.id.sandwichShops);
         cuisines = (Button) findViewById(R.id.cuisines);
-        cost = (Button) findViewById(R.id.cost);
         
         coffeeShops.setOnClickListener(new OnClickListener() {
 
@@ -83,15 +82,7 @@ public class SelectCategory extends SherlockActivity {
 			}
         	
         });
-        
-        cost.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				//
-			}
-        	
-        });
-
+       
     }
 
 	@Override

@@ -133,8 +133,16 @@ public class ViewResults extends SherlockActivity implements
 					List<String> titles = new ArrayList<String>(places.getResults()
 							.size());
 					for (Place p : places.getResults()) {
-						titles.add(p.toString());
 						
+						Location placeLocation = new Location("Place Location");
+						placeLocation.setLatitude(p.getGeometry().getLocation().getLat());
+						placeLocation.setLongitude(p.getGeometry().getLocation().getLng());
+						
+						float distance = currentLocation.distanceTo(placeLocation);
+	
+						titles.add(p.getName() + "\n" + p.getVicinity() + "\nEuclidean Distance: "+
+								distance + "m");
+						//titles.add(p.toString());
 					}
 					ArrayAdapter<String> adapter = new ArrayAdapter<String>(ViewResults.this,
 							R.layout.place_title, R.id.placeTitle, titles);

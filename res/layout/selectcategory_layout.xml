@@ -40,10 +40,4 @@
         android:layout_width="180dp"
         android:layout_height="wrap_content"
        	android:text="Select Cuisines" />
-
-    <Button
-        android:id="@+id/cost"
-        android:layout_width="180dp"
-        android:layout_height="wrap_content"
-       	android:text="Cost Search" />
 </LinearLayout>

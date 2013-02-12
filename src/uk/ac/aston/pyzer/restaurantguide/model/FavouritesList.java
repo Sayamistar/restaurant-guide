@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class FavouritesList {
 	
 	private static FavouritesList instance = null;
-	private static ArrayList<Place> items = null;
+	private static ArrayList<FavouritePlace> items = null;
 	
 	protected FavouritesList() {
 		
@@ -15,13 +15,13 @@ public class FavouritesList {
 		if (instance == null) {
 			instance = new FavouritesList();
 			
-			items = new ArrayList<Place>();
+			items = new ArrayList<FavouritePlace>();
 		}
 		
 		return instance;
 	}
 	
-	public ArrayList<Place> getPlaces() {
+	public ArrayList<FavouritePlace> getPlaces() {
 		return items;
 	}
 	

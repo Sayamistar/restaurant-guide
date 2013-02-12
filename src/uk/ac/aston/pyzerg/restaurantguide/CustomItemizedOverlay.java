@@ -18,7 +18,6 @@ public class CustomItemizedOverlay extends ItemizedOverlay<OverlayItem> {
    
    public CustomItemizedOverlay(Drawable defaultMarker) {
         super(boundCenterBottom(defaultMarker));
-        
    }
    
    public CustomItemizedOverlay(Drawable defaultMarker, Context context) {

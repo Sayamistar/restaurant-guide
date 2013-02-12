@@ -10,33 +10,37 @@
         android:layout_height="wrap_content"
         android:text="TextView" >
     </TextView>
-
-    <TextView
-        android:id="@+id/vicinity"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView" >
-    </TextView>
-
-    <TextView
-        android:id="@+id/rating"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView" >
-    </TextView>
     
+    <RelativeLayout
+        android:id="@+id/detailsButtons"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+ 
     <Button
         android:id="@+id/savePlace"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Add to Favourites" />
     
-	<ImageButton
-        android:id="@+id/alreadyFavourite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/already_favourite"
-        android:contentDescription="Already Favourite" />
+	<Button
+	    android:id="@+id/sendToFriend"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_toRightOf="@id/savePlace"
+	    android:text="Send to friend" />
+	
+		<ImageButton
+		    android:id="@+id/alreadyFavourite"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_alignParentLeft="false"
+		    android:layout_alignParentRight="true"
+		    android:background="@drawable/already_favourite"
+		    android:contentDescription="Already Favourite" />
+	
+	</RelativeLayout>
+    
+
 
     <LinearLayout
         android:id="@+id/linearLayout1"

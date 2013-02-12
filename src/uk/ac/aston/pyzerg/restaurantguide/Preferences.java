@@ -19,6 +19,8 @@ public class Preferences extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.preferences_layout);
 		
+		this.setTitle("Preferences");
+		
 		radiusSpinner = (Spinner) findViewById(R.id.radius_spinner);
 		
 		String[] radiuses = new String[] {"50", "100", "500", "1000", "2000", "5000", "10000", "50000"};

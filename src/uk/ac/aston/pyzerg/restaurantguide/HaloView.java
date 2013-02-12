@@ -10,8 +10,6 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 
 import com.actionbarsherlock.app.SherlockMapActivity;
@@ -23,11 +21,14 @@ import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 
-public class HaloView extends SherlockMapActivity implements OnClickListener {
+public class HaloView extends SherlockMapActivity  {
 	private String myLoc;
 	private PlaceList places;
-	private PlaceItemizedOverlay itemizedOverlay;
 	private MapView mv;
+	private MapController mc;
+	private GeoPoint gp;
+	private Button circleButton;
+	private Button lineButton;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -35,13 +36,12 @@ public class HaloView extends SherlockMapActivity implements OnClickListener {
 		setContentView(R.layout.halo_view);
 		
 		this.setTitle("Location");
-		itemizedOverlay = null;
 		
 		// find the UI components
 		mv = (MapView) findViewById(R.id.halomap);
 		mv.setBuiltInZoomControls(true);
-		Button circleButton = (Button) this.findViewById(R.id.circleButton);
-		Button lineButton = (Button) this.findViewById(R.id.lineButton);
+		circleButton = (Button) this.findViewById(R.id.circleButton);
+		lineButton = (Button) this.findViewById(R.id.lineButton);
 		
 		// extract the current location and list of places from the intent
 		Intent i = this.getIntent();
@@ -55,39 +55,24 @@ public class HaloView extends SherlockMapActivity implements OnClickListener {
 			if (locs.length == 2) {
 				// create a GeoPoint for my location (the initial center of the
 				// map)
-				GeoPoint gp = new GeoPoint(
+				gp = new GeoPoint(
 						(int) (Float.parseFloat(locs[0]) * 1e6),
 						(int) (Float.parseFloat(locs[1]) * 1e6));
+				
 				int maxZoom = mv.getMaxZoomLevel();
-				int initZoom = (int) (0.80 * (double) maxZoom);
+				int initZoom = (int) (0.70 * (double) maxZoom);
+				
+				createOverlays();
 
-				MapController mc = mv.getController();
+				mc = mv.getController();
 				mc.setZoom(initZoom);
 				mc.animateTo(gp);
-				mc.setCenter(gp);
-
-				// now set up the overlays
-				List<Overlay> mapOverlays = mv.getOverlays();
-				// this is the drawable which is plotted at the site on the map (a pushpin)
-				Drawable drawable = this.getResources().getDrawable(
-						R.drawable.red_pushpin);
-				// The itemizedOverlay contains a list of overlays
-				itemizedOverlay = new PlaceItemizedOverlay(drawable,
-						HaloView.this);
-				// set the center location
-				itemizedOverlay.setCenter(gp);
-				// add all the places to the itemizedOverlay
-				for (Place p : places.getResults()) {
-					// GeoPoint point = p.getGeoPoint();
-					PlaceOverlayItem overlayItem = new PlaceOverlayItem(p);
-					itemizedOverlay.addOverlay(overlayItem);
-				}
-				// add our itemizedOverlay to the overlays for this map view
-				mapOverlays.add(itemizedOverlay);
+				//mc.setCenter(gp);
 				
 				// set up the callbacks for the buttons
-				circleButton.setOnClickListener(this);
-				lineButton.setOnClickListener(this);
+				//circleButton.setOnClickListener(this);
+				//lineButton.setOnClickListener(this);
+				
 			}
 
 		} else {
@@ -124,6 +109,7 @@ public class HaloView extends SherlockMapActivity implements OnClickListener {
 		return false;
 	}
 
+	/**
 	public void onClick(View v) {
 		if (itemizedOverlay != null) {
 			if (v.getId() == R.id.circleButton) {
@@ -135,6 +121,33 @@ public class HaloView extends SherlockMapActivity implements OnClickListener {
 			}
 			mv.invalidate();
 		}
+	}*/
+	
+	private void createOverlays() {
+		// this is the drawable which is plotted at the site on the map (a pushpin)
+		Drawable drawable = this.getResources().getDrawable(
+				R.drawable.ic_launcher);
+		// The itemizedOverlay contains a list of overlays
+		PlaceItemizedOverlay itemizedOverlay = new PlaceItemizedOverlay(drawable,
+				HaloView.this);
+		// set the center location
+		//itemizedOverlay.setCenter(gp);
+		// add all the places to the itemizedOverlay
+		for (Place p : places.getResults()) {
+			// GeoPoint point = p.getGeoPoint();
+			PlaceOverlayItem overlayItem = new PlaceOverlayItem(p);
+			itemizedOverlay.addOverlay(overlayItem);
+		}
+		
+		itemizedOverlay.populateOverlay();
+		
+		// now set up the overlays
+		List<Overlay> mapOverlays = mv.getOverlays();
+		mv.invalidate();
+		
+		// add our itemizedOverlay to the overlays for this map view
+		mapOverlays.add(itemizedOverlay);
+
 	}
 
 }
