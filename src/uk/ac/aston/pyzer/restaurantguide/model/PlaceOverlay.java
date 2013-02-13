@@ -1,20 +1,34 @@
 package uk.ac.aston.pyzer.restaurantguide.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
+import uk.ac.aston.pyzer.restaurantguide.model.Place.Photo;
+import uk.ac.aston.pyzerg.restaurantguide.R;
+import uk.ac.aston.pyzerg.restaurantguide.TouristHttpTransport;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapView;
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestFactory;
 
 public class PlaceOverlay extends ItemizedOverlay<MyPlaceOverlayItem> {
 
@@ -23,7 +37,10 @@ public class PlaceOverlay extends ItemizedOverlay<MyPlaceOverlayItem> {
 	private ArrayList<MyPlaceOverlayItem> myOverlays = new ArrayList<MyPlaceOverlayItem>();
 	private MapView mapView;
 	private Bitmap bitmap;
-
+	private Paint circlePaint;
+	private Point centerSP;
+	private Bitmap image;
+	
 	public PlaceOverlay(Drawable defaultMarker, MapView mapView) {
 		super(boundCenterBottom(defaultMarker));
 		this.mapView = mapView;
@@ -51,6 +68,10 @@ public class PlaceOverlay extends ItemizedOverlay<MyPlaceOverlayItem> {
 	@Override
 	public int size() {
 		return myOverlays.size();
+	}
+	
+	public MapView getMapView() {
+		return this.mapView;
 	}
 
 	// check to see if items/groups are overlapping
@@ -157,6 +178,12 @@ public class PlaceOverlay extends ItemizedOverlay<MyPlaceOverlayItem> {
 			// create the dialog to show the place details
 			AlertDialog.Builder dialog = new AlertDialog.Builder(
 					mapView.getContext());
+			
+			// get the layout inflater
+			LayoutInflater factory = LayoutInflater.from(mapView.getContext());
+			final View view = factory.inflate(R.layout.dialog_layout, null);
+			dialog.setView(view);
+
 			dialog.setTitle(myOverlays.get(index).getPlace().getName());
 			if (placeDetail != null) {
 
@@ -172,6 +199,39 @@ public class PlaceOverlay extends ItemizedOverlay<MyPlaceOverlayItem> {
 				} else {
 					ratingValue = "None";
 					reviews = " (no reviews)";
+				}
+				
+				List<Photo> photos = new ArrayList<Photo>();
+				photos = placeDetail.getResult().getPhotos();
+				
+				if (photos != null && photos.size() > 0) {
+					String photoRef = photos.get(0).getPhoto_reference();
+					
+					Log.e("photo ref", "photo ref: " + photoRef);
+					
+					HttpRequestFactory hrf = TouristHttpTransport.createRequestFactory();
+					try {
+						HttpRequest request = hrf.buildGetRequest(new GenericUrl(
+							mapView.getResources().getString(R.string.places_photos_url)));
+						request.getUrl().put("key", mapView.getResources().getString(R.string.google_places_key));
+						request.getUrl().put("photoreference", photoRef);
+						request.getUrl().put("sensor", true);
+						request.getUrl().put("maxwidth", 200);
+						
+						image = BitmapFactory.decodeStream(request.execute().getContent());
+		
+						
+					} catch (IOException e) {
+						Log.e("IOException", "Photo request failed" + e.getMessage());
+					} 
+					
+					if (image != null) { 
+						LinearLayout ll = (LinearLayout) view.findViewById(R.id.dialogLayout);
+		
+						ImageView imageView = (ImageView) ll.findViewById(R.id.placePhoto);
+						imageView.setImageBitmap(image);
+					}
+
 				}
 
 				dialog.setMessage("Address: "
@@ -192,21 +252,29 @@ public class PlaceOverlay extends ItemizedOverlay<MyPlaceOverlayItem> {
 			dialog.show();
 		}
 
-		// Toast.makeText(mapView.getContext(), myOverlays.get(index).getName(),
-		// Toast.LENGTH_SHORT).show();
 		return true;
 	}
 
 	public void draw(Canvas canvas, MapView mapview, boolean b) {
 		// create a
-		Point centerSP = new Point();
+		//Point centerSP = new Point();
+		if (!objectExists(centerSP)) {
+			centerSP = new Point();
+		}
+		
 		mapview.getProjection().toPixels(mapview.getMapCenter(), centerSP);
 
+		if (!objectExists(circlePaint)) {
+			circlePaint = new Paint();
+			circlePaint.setColor(0x55ff0000);
+			circlePaint.setAlpha(10);
+			circlePaint.setStyle(Paint.Style.FILL_AND_STROKE);
+		}
 		// set up a paint for the circles
-		Paint circlePaint = new Paint();
-		circlePaint.setColor(0x55ff0000);
-		circlePaint.setAlpha(10);
-		circlePaint.setStyle(Paint.Style.FILL_AND_STROKE);
+		//Paint circlePaint = new Paint();
+		//circlePaint.setColor(0x55ff0000);
+		//circlePaint.setAlpha(10);
+		//circlePaint.setStyle(Paint.Style.FILL_AND_STROKE);
 
 		// find out the width and height of the view
 		int width = mapview.getWidth();
@@ -216,6 +284,7 @@ public class PlaceOverlay extends ItemizedOverlay<MyPlaceOverlayItem> {
 
 			Point screenPts = new Point();
 			mapview.getProjection().toPixels(p.getPoint(), screenPts);
+		
 
 			// check if this item is off screen or not
 			if (screenPts.x > centerSP.x + (width / 2)
@@ -239,8 +308,14 @@ public class PlaceOverlay extends ItemizedOverlay<MyPlaceOverlayItem> {
 					oy = 0;
 
 				double distanceSP = Math.sqrt((ox * ox) + (oy * oy));
-				// draw a circle around this item centered at its location
-				drawCircle(screenPts, (float) distanceSP, circlePaint, canvas);
+	
+				// if distance in pixels is > 1000, we won't draw the circles
+				// improves performance
+				if (distanceSP <= 1000) {
+					// draw a circle around this item centered at its location
+					drawCircle(screenPts, (float) distanceSP, circlePaint, canvas);
+				}
+				
 				canvas.drawBitmap(bitmap, screenPts.x - 20, screenPts.y - 43,
 						null);
 			} else {
@@ -257,5 +332,13 @@ public class PlaceOverlay extends ItemizedOverlay<MyPlaceOverlayItem> {
 		// draw a circle radius 100 pixels
 		canvas.drawCircle(location.x, location.y, radius, paint);
 	}
-
+	
+	private boolean objectExists(Object o) {
+		if (o != null) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 }

@@ -17,6 +17,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -45,6 +47,9 @@ public class ViewResults extends SherlockActivity implements
 	
     private LocationManager locationManager;
     private Location currentLocation;
+    
+    private String nextPageToken;
+    private int tokenNumber = 0;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -62,14 +67,24 @@ public class ViewResults extends SherlockActivity implements
 		/* Use the LocationManager class to obtain GPS locations */
         // set up location manager to work with GPS
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 
         // get the current location (or last known) from the location manager
-        currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+       // currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        locationManager.requestLocationUpdates(
+				LocationManager.NETWORK_PROVIDER, 5000, 100, this);
+        
+        currentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         
         if (currentLocation != null) {
         	location = currentLocation.getLatitude() + "," + currentLocation.getLongitude();
         }
+
+        places = new PlaceList();
+        
+        nextPageToken = "";
+        
+        Log.e("test", "test" + location);
         
         Intent intent = this.getIntent();
         keyword = intent.getStringExtra("keyword");
@@ -89,12 +104,29 @@ public class ViewResults extends SherlockActivity implements
 						request.getUrl().put("radius", Config.RADIUS);
 						request.getUrl().put("keyword", keyword);
 						request.getUrl().put("sensor", false);
+						if (nextPageToken != "") {
+							request.getUrl().put("pagetoken", places.getNext_page_token());
+						}
 						Log.i(Config.MSGTAG, "Request: " + request.toString());
-						places = request.execute().parseAs(PlaceList.class);
+						PlaceList temp = request.execute().parseAs(PlaceList.class);
+						
+						if (places.getResults() == null) {
+							places.setResults(temp.getResults());
+							
+						} else {
+							places.getResults().addAll(temp.getResults());
+						}
 
-						 /*if (places.getNext_page_token() != null || places.getNext_page_token() != "") {
+						if (temp.getNext_page_token() != null || temp.getNext_page_token() != "") {
+							nextPageToken = temp.getNext_page_token();
+							tokenNumber++;
+						}
+						else {
+							nextPageToken = "";
+							tokenNumber = 0;
+						}
 				    
-							 try {
+							/* try {
 									Thread.sleep(2000);
 								} catch (InterruptedException e) {
 									// TODO Auto-generated catch block
@@ -149,10 +181,34 @@ public class ViewResults extends SherlockActivity implements
 					ListView l = (ListView) ViewResults.this.findViewById(R.id.placeList);
 					l.setAdapter(adapter);
 					l.setOnItemClickListener(ViewResults.this);
+					l.setOnScrollListener(new OnScrollListener() {
+
+						@Override
+						public void onScroll(AbsListView view,
+								int firstVisibleItem, int visibleItemCount,
+								int totalItemCount) {
+							if (++firstVisibleItem + visibleItemCount > totalItemCount) {
+								if (tokenNumber == 1 || tokenNumber == 2) {
+									GoogleRequest googleRequest = new GoogleRequest();
+									googleRequest.execute();
+								}
+							}
+							
+						}
+
+						@Override
+						public void onScrollStateChanged(AbsListView view,
+								int scrollState) {
+							// TODO Auto-generated method stub
+							
+						}
 						
+					});
+					
 					Toast.makeText(getApplicationContext(), places.getResults().size() + " results", Toast.LENGTH_LONG).show();
-					}
-        	
+					
+			
+				}
         	}	
 	
         	
@@ -211,7 +267,9 @@ public class ViewResults extends SherlockActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        locationManager.requestLocationUpdates(
+				LocationManager.NETWORK_PROVIDER, 5000, 100, this);
     }
     
     /**
@@ -227,8 +285,15 @@ public class ViewResults extends SherlockActivity implements
         return false;
     }
 
-	public void onLocationChanged(Location arg0) {	
+	/*public void onLocationChanged(Location arg0) {	
 		currentLocation = arg0;
+	}*/
+	
+	@Override
+	public void onLocationChanged(Location location) {
+		locationManager.removeUpdates(this);
+		currentLocation = location;
+
 	}
 
 	public void onProviderDisabled(String arg0) {

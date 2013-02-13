@@ -9,6 +9,6 @@
     <string name="google_maps_key">0katdD8Epc4-ZP-liXilmm19kmXgtWaU_5-8r_A</string>
     <string name="places_search_url">https://maps.googleapis.com/maps/api/place/search/json</string>
     <string name="places_details_url">https://maps.googleapis.com/maps/api/place/details/json</string>
-    <string name="places_photos_url">https://maps.googleapis.com/maps/api/place/photo</string>    
+    <string name="places_photos_url">https://maps.googleapis.com/maps/api/place/photo</string> 
     
 </resources>

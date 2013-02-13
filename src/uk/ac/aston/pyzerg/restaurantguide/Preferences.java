@@ -3,6 +3,7 @@ package uk.ac.aston.pyzerg.restaurantguide;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
@@ -52,6 +53,11 @@ public class Preferences extends SherlockActivity {
 			prefs = new PreferenceManager(this.getApplicationContext());
 			prefs.setRadius(Config.RADIUS);
 			prefs.save();
+			
+			Toast.makeText(this, "Preferences saved!", Toast.LENGTH_SHORT).show();
+			
+			this.finish();
+			
 			break;
 		}
 
