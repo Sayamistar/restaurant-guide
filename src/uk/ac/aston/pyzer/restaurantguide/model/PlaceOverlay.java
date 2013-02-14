@@ -17,6 +17,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,6 +41,7 @@ public class PlaceOverlay extends ItemizedOverlay<MyPlaceOverlayItem> {
 	private Paint circlePaint;
 	private Point centerSP;
 	private Bitmap image;
+	private String photoRef;
 	
 	public PlaceOverlay(Drawable defaultMarker, MapView mapView) {
 		super(boundCenterBottom(defaultMarker));
@@ -181,9 +183,12 @@ public class PlaceOverlay extends ItemizedOverlay<MyPlaceOverlayItem> {
 			
 			// get the layout inflater
 			LayoutInflater factory = LayoutInflater.from(mapView.getContext());
-			final View view = factory.inflate(R.layout.dialog_layout, null);
-			dialog.setView(view);
+			// get the dialog view
+			final View dialogView = factory.inflate(R.layout.dialog_layout, null);
+			// set the dialog to use this custom view
+			dialog.setView(dialogView);
 
+			// get place details and add it to the dialog
 			dialog.setTitle(myOverlays.get(index).getPlace().getName());
 			if (placeDetail != null) {
 
@@ -201,37 +206,56 @@ public class PlaceOverlay extends ItemizedOverlay<MyPlaceOverlayItem> {
 					reviews = " (no reviews)";
 				}
 				
+				// get the photos list
 				List<Photo> photos = new ArrayList<Photo>();
 				photos = placeDetail.getResult().getPhotos();
 				
+				// assuming that photos were sent back
+				// get the first photo reference
+				// TODO: could get a random photo maybe
 				if (photos != null && photos.size() > 0) {
-					String photoRef = photos.get(0).getPhoto_reference();
+					photoRef = photos.get(0).getPhoto_reference();
 					
-					Log.e("photo ref", "photo ref: " + photoRef);
-					
-					HttpRequestFactory hrf = TouristHttpTransport.createRequestFactory();
-					try {
-						HttpRequest request = hrf.buildGetRequest(new GenericUrl(
-							mapView.getResources().getString(R.string.places_photos_url)));
-						request.getUrl().put("key", mapView.getResources().getString(R.string.google_places_key));
-						request.getUrl().put("photoreference", photoRef);
-						request.getUrl().put("sensor", true);
-						request.getUrl().put("maxwidth", 200);
-						
-						image = BitmapFactory.decodeStream(request.execute().getContent());
-		
-						
-					} catch (IOException e) {
-						Log.e("IOException", "Photo request failed" + e.getMessage());
-					} 
-					
-					if (image != null) { 
-						LinearLayout ll = (LinearLayout) view.findViewById(R.id.dialogLayout);
-		
-						ImageView imageView = (ImageView) ll.findViewById(R.id.placePhoto);
-						imageView.setImageBitmap(image);
-					}
+					class GoogleRequest extends AsyncTask<Void, Void, Integer> {
 
+						@Override
+						protected Integer doInBackground(Void... params) {
+							HttpRequestFactory hrf = TouristHttpTransport.createRequestFactory();
+							try { 
+								// send the photo reference to the photos API
+								HttpRequest request = hrf.buildGetRequest(new GenericUrl(
+										mapView.getResources().getString(R.string.places_photos_url)));
+								request.getUrl().put("key", mapView.getResources().getString(R.string.google_places_key));
+								request.getUrl().put("photoreference", photoRef);
+								request.getUrl().put("sensor", true);
+								request.getUrl().put("maxwidth", 200);
+								
+								// get the photo back as a bitmap
+								image = BitmapFactory.decodeStream(request.execute().getContent());
+				
+							} catch (IOException e) {
+								Log.e("IOException", "Photo request failed" + e.getMessage());
+							} 	
+							return null;
+					}
+					
+					@Override
+					protected void onPostExecute(Integer result) {
+						if (image != null) { 
+							// get the layout from the dialog view
+							LinearLayout ll = (LinearLayout) dialogView.findViewById(R.id.dialogLayout);
+							// get the image view from layout
+							ImageView imageView = (ImageView) ll.findViewById(R.id.placePhoto);
+							// set the bitmap as the image source
+							imageView.setImageBitmap(image);
+						}
+					}
+					
+					}
+					
+					GoogleRequest googleRequest = new GoogleRequest();
+		            googleRequest.execute();
+					
 				}
 
 				dialog.setMessage("Address: "
