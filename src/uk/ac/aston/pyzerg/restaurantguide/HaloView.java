@@ -10,7 +10,6 @@ import uk.ac.aston.pyzer.restaurantguide.model.MyPlaceOverlayItem;
 import uk.ac.aston.pyzer.restaurantguide.model.Place;
 import uk.ac.aston.pyzer.restaurantguide.model.PlaceList;
 import uk.ac.aston.pyzer.restaurantguide.model.PlaceOverlay;
-import uk.ac.aston.pyzerg.restaurantguide.R;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -19,15 +18,11 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 
-import com.actionbarsherlock.app.SherlockMapActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapController;
 import com.google.android.maps.Overlay;
 
-public class HaloView extends SherlockMapActivity implements
+public class HaloView extends MySherlockMapActivity implements
 		LocationListener, IOnZoomListener {
 
 	private static final int DEFAULT_ZOOM = 15;
@@ -81,29 +76,6 @@ public class HaloView extends SherlockMapActivity implements
 
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getSupportMenuInflater();
-		inflater.inflate(R.menu.home_menu, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		super.onOptionsItemSelected(item);
-
-		Intent intent;
-
-		switch (item.getItemId()) {
-		case R.id.preferences:
-			intent = new Intent(this, Preferences.class);
-			startActivity(intent);
-			break;
-		}
-
-		return super.onOptionsItemSelected(item);
-	}
-
 	private void animateToPlaceOnMap(final GeoPoint geopoint) {
 		mapView.post(new Runnable() {
 
@@ -132,7 +104,6 @@ public class HaloView extends SherlockMapActivity implements
 	protected void onPause() {
 		super.onPause();
 		locationManager.removeUpdates(this);
-
 	}
 
 	@Override
@@ -140,7 +111,6 @@ public class HaloView extends SherlockMapActivity implements
 		super.onResume();
 		locationManager.requestLocationUpdates(
 				LocationManager.NETWORK_PROVIDER, 5000, 100, this);
-
 	}
 
 	private void displayPlacesOnMap() {
@@ -169,7 +139,6 @@ public class HaloView extends SherlockMapActivity implements
 
 	@Override
 	public void onLocationChanged(Location location) {
-
 		locationManager.removeUpdates(this);
 
 		double myLatitude = location.getLatitude();
@@ -202,7 +171,5 @@ public class HaloView extends SherlockMapActivity implements
 		if (placeOverlay != null) {
 			placeOverlay.calculateItems();
 		}
-
 	}
-
 }

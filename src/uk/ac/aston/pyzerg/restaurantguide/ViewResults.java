@@ -27,15 +27,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 
-public class ViewResults extends SherlockActivity implements 
+public class ViewResults extends MySherlockActivity implements 
 		OnItemClickListener, OnClickListener, LocationListener {
 	private PlaceList places;
 	private HttpRequestFactory hrf;
@@ -64,13 +60,13 @@ public class ViewResults extends SherlockActivity implements
 		
 		loading = (TextView) this.findViewById(R.id.loading);
 
-		/* Use the LocationManager class to obtain GPS locations */
-        // set up location manager to work with GPS
+        // set up location manager to work with location service
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 
+        //TODO: Need to check for connection otherwise it will fail when no Internet/Data
+        
         // get the current location (or last known) from the location manager
-       // currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         locationManager.requestLocationUpdates(
 				LocationManager.NETWORK_PROVIDER, 5000, 100, this);
         
@@ -83,8 +79,6 @@ public class ViewResults extends SherlockActivity implements
         places = new PlaceList();
         
         nextPageToken = "";
-        
-        Log.e("test", "test" + location);
         
         Intent intent = this.getIntent();
         keyword = intent.getStringExtra("keyword");
@@ -199,8 +193,6 @@ public class ViewResults extends SherlockActivity implements
 						@Override
 						public void onScrollStateChanged(AbsListView view,
 								int scrollState) {
-							// TODO Auto-generated method stub
-							
 						}
 						
 					});
@@ -221,29 +213,6 @@ public class ViewResults extends SherlockActivity implements
 	
 	}
 	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getSupportMenuInflater();
-		inflater.inflate(R.menu.home_menu, menu);
-		return true;
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		super.onOptionsItemSelected(item);
-
-		Intent intent;
-
-		switch (item.getItemId()) {
-		case R.id.preferences:
-			intent = new Intent(this, Preferences.class);
-			startActivity(intent);
-			break;
-		}
-
-		return super.onOptionsItemSelected(item);
-	}
-	
 	public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 		Place p = places.getResults().get(position);
 		Intent i = new Intent(this, ViewPlaceDetails.class);
@@ -253,28 +222,22 @@ public class ViewResults extends SherlockActivity implements
 
 	public void onClick(View v) {
 		if (v.getId() == R.id.plot) {
-			// plot all the places with halos and lines.
+			// plot all the places with halos
 			Intent intent = new Intent(this, HaloView.class);
 			intent.putExtra("location", location);
 			intent.putExtra("placeList", this.places);
 			startActivity(intent);
 		}
 	}
-	
-    /**
-     * When the activity starts up, request updates
-     */
+	// when the activity starts up, request updates
     @Override
     protected void onResume() {
         super.onResume();
-        //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         locationManager.requestLocationUpdates(
 				LocationManager.NETWORK_PROVIDER, 5000, 100, this);
     }
     
-    /**
-     * When the activity is paused, stop listening for updates
-     */
+    // when activity is paused, stop listening for updates
     @Override
     protected void onPause() {
         super.onPause();
@@ -284,16 +247,11 @@ public class ViewResults extends SherlockActivity implements
     protected boolean isRouteDisplayed() {	
         return false;
     }
-
-	/*public void onLocationChanged(Location arg0) {	
-		currentLocation = arg0;
-	}*/
 	
 	@Override
 	public void onLocationChanged(Location location) {
 		locationManager.removeUpdates(this);
 		currentLocation = location;
-
 	}
 
 	public void onProviderDisabled(String arg0) {

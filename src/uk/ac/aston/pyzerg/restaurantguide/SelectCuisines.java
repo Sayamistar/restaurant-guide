@@ -9,12 +9,7 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-
-public class SelectCuisines extends SherlockActivity {
+public class SelectCuisines extends MySherlockActivity {
 
 	private LinearLayout checkboxes;
 	private CheckBox all;
@@ -84,28 +79,5 @@ public class SelectCuisines extends SherlockActivity {
 
 		});
 
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getSupportMenuInflater();
-		inflater.inflate(R.menu.home_menu, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		super.onOptionsItemSelected(item);
-
-		Intent intent;
-
-		switch (item.getItemId()) {
-		case R.id.preferences:
-			intent = new Intent(this, Preferences.class);
-			startActivity(intent);
-			break;
-		}
-
-		return super.onOptionsItemSelected(item);
 	}
 }

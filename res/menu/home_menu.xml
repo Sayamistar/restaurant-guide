@@ -2,6 +2,13 @@
     style="@style/Theme.Sherlock" >
 
     <item
+        android:id="@+id/favourites"
+        style="@style/Theme.Sherlock"
+        android:icon="@drawable/ic_action_star"
+        android:showAsAction="ifRoom"
+        android:title="Favourites"/>
+    
+    <item
         android:id="@+id/preferences"
         style="@style/Theme.Sherlock"
         android:icon="@drawable/pref"

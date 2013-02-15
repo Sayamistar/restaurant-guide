@@ -1,13 +1,31 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/dialogLayout"
-    android:orientation="vertical"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
-    <ImageView
-        android:id="@+id/placePhoto"
-        android:layout_width="wrap_content"
-        android:layout_height="150dp"
-      	android:layout_gravity="center"
-        android:contentDescription="@string/app_name" />
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    style="@style/dialogLight">
 
-</LinearLayout>
+    <LinearLayout
+        android:id="@+id/dialogLayout"
+        style="@style/dialogLight"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+        
+        <TextView
+            android:id="@+id/dialogMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:textSize="18sp" />
+        
+        <LinearLayout
+            android:id="@+id/dialogRatings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingLeft="10dip"
+            android:paddingBottom="10dip" />
+        
+    </LinearLayout>
+        
+
+</ScrollView>
