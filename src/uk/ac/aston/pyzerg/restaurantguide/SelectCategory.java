@@ -1,14 +1,29 @@
 package uk.ac.aston.pyzerg.restaurantguide;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.type.TypeFactory;
+import org.codehaus.jackson.type.TypeReference;
+
+import uk.ac.aston.pyzer.restaurantguide.model.FavouritePlace;
+import uk.ac.aston.pyzer.restaurantguide.model.FavouritesList;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
-public class SelectCategory extends MySherlockActivity {
+public class SelectCategory extends MySherlockActivity implements OnItemClickListener {
 	
-	private Button coffeeShops, fastFoodOutlets, foodCourts, bars, sandwichShops, cuisines;
+	private String[] categories;
+	private ArrayAdapter<String> adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -17,66 +32,62 @@ public class SelectCategory extends MySherlockActivity {
         
         this.setTitle("Select Category");
         
-        coffeeShops = (Button) findViewById(R.id.coffeeShops);
-        fastFoodOutlets = (Button) findViewById(R.id.fastFoodOutlets);
-        foodCourts = (Button) findViewById(R.id.foodCourts);
-        bars = (Button) findViewById(R.id.bars);
-        sandwichShops = (Button) findViewById(R.id.sandwichShops);
-        cuisines = (Button) findViewById(R.id.cuisines);
         
-        coffeeShops.setOnClickListener(new OnClickListener() {
+        
+        // load favourites
+        try {
+			ObjectMapper mapper = new ObjectMapper();
+			String filePath = this.getFilesDir().getPath().toString() + "/favourites.json";
+			//<FavouritePlace> favourites = new ArrayList<FavouritePlace>();
+			ArrayList<FavouritePlace> favourites = mapper.readValue(new File(filePath), new TypeReference<ArrayList<FavouritePlace>>(){});
+		
+			//favourites = mapper.readValue(new File(filePath), new TypeReference<ArrayList<FavouritePlace>>(){});
+			FavouritesList.getInstance().setPlaces(favourites);
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-			public void onClick(View v) {
-				Intent intent = new Intent(SelectCategory.this, ViewResults.class);
-				intent.putExtra("keyword", "coffee");
-				startActivity(intent);
-			}
-        	
-        });
-        fastFoodOutlets.setOnClickListener(new OnClickListener() {
+        // end loading
+        
+        
+        categories = new String[] {"All Restaurants", "Coffee Shops", "Fast Food", "Food Court", "Bars", "Sandwich Shops", "Buffet", "Vegetarian Food", "Select Cuisines"};
+        
+    	adapter = new ArrayAdapter<String>(
+    			this, android.R.layout.simple_list_item_1, android.R.id.text1, categories);
+		
+		ListView l = (ListView) this.findViewById(R.id.categoryList);
+		l.setAdapter(adapter);
+		l.setOnItemClickListener(this);
 
-			public void onClick(View v) {
-				Intent intent = new Intent(SelectCategory.this, ViewResults.class);
-				intent.putExtra("keyword", "fast food");
-				startActivity(intent);
-			}
-        	
-        });
-        foodCourts.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				Intent intent = new Intent(SelectCategory.this, ViewResults.class);
-				intent.putExtra("keyword", "food court");
-				startActivity(intent);
-			}
-        	
-        });
-        bars.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				Intent intent = new Intent(SelectCategory.this, ViewResults.class);
-				intent.putExtra("keyword", "bar");
-				startActivity(intent);
-			}
-        	
-        });
-        sandwichShops.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				Intent intent = new Intent(SelectCategory.this, ViewResults.class);
-				intent.putExtra("keyword", "sandwich");
-				startActivity(intent);
-			}
-        	
-        });
-        cuisines.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				Intent intent = new Intent(SelectCategory.this, SelectCuisines.class);
-				startActivity(intent);
-			}
-        	
-        });
-       
     }
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+		String category = categories[position];
+		
+		
+		if (category.equals("All Restaurants")) {
+			Intent intent = new Intent(SelectCategory.this, ViewResults.class);
+			intent.putExtra("keyword", "restaurant");
+			startActivity(intent);
+		} else if (category.equals("Select Cuisines")) {
+			Intent intent = new Intent(SelectCategory.this, SelectCuisines.class);
+			startActivity(intent);
+		}
+		else {
+			Intent intent = new Intent(SelectCategory.this, ViewResults.class);
+			intent.putExtra("keyword", category);
+			startActivity(intent);
+		}
+	}
+	
+}
+
+class MyWrapper {
+	public ArrayList<FavouritePlace> favourites;
 }

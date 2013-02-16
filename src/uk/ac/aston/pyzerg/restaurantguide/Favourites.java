@@ -133,7 +133,7 @@ public class Favourites extends SherlockActivity implements OnItemClickListener 
 
 	public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 		Place p = FavouritesList.getInstance().getPlaces().get(position).getPlace();
-		Intent i = new Intent(this, ViewPlaceDetails.class);
+		Intent i = new Intent(this, HaloView.class);
 		i.putExtra("place", p);
 		startActivity(i);
 	}
@@ -144,8 +144,9 @@ public class Favourites extends SherlockActivity implements OnItemClickListener 
 
 		List<String> titles = new ArrayList<String>(FavouritesList
 				.getInstance().getPlaces().size());
+		int count = 1;
 		for (FavouritePlace fp : FavouritesList.getInstance().getPlaces()) {
-			titles.add(fp.toString());
+			titles.add(count++ + ". " + fp.toString());
 		}
 
 		// if there are no results, show the textview

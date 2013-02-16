@@ -3,22 +3,22 @@ package uk.ac.aston.pyzer.restaurantguide.model;
 import android.graphics.drawable.Drawable;
 import android.widget.Toast;
 
-import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapView;
 
 public class MyCurrentLocationOverlay extends ItemizedOverlay<MyOverlayItem> {
 	
-	MyOverlayItem myOverlayItem;
+	private MyOverlayItem myOverlayItem;
+	private MapView mapView;
 	
 	public MyCurrentLocationOverlay(Drawable defaultMarker, MapView mapView) {
 		 super(boundCenterBottom(defaultMarker));
-			 populate(); // Add this
+			 this.mapView = mapView;
 	}
 
 	public void addOverlay(MyOverlayItem overlay) {
 	   myOverlayItem = overlay;
-	    populate();
+	   populate();
 	}
 	
 	public MyOverlayItem getMyItem(){
@@ -26,6 +26,7 @@ public class MyCurrentLocationOverlay extends ItemizedOverlay<MyOverlayItem> {
 	}
 	
 	@Override
+	// we only have one item so just return it
 	protected MyOverlayItem createItem(int i) {
 		return myOverlayItem;
 	}
@@ -40,9 +41,12 @@ public class MyCurrentLocationOverlay extends ItemizedOverlay<MyOverlayItem> {
 	}
 	
 	@Override
-	public boolean onTap(GeoPoint p, MapView mapView) {
-		Toast.makeText(mapView.getContext(), myOverlayItem.getName(), Toast.LENGTH_SHORT).show();
-		return true;
+	// if my location is on the map, then display toast
+	protected boolean onTap(int index) {
+		if (this.size() == 1) {
+			Toast.makeText(mapView.getContext(), myOverlayItem.getName(), Toast.LENGTH_SHORT).show();
+		}
+		
+		return true;	
 	}
-
 }

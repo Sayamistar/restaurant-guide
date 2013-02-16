@@ -12,10 +12,12 @@ import com.google.api.client.json.jackson.JacksonFactory;
 
 public class TouristHttpTransport {
 	
-	
-	private static final HttpTransport transport = new ApacheHttpTransport();
+	// private static final HttpTransport transport = new ApacheHttpTransport();
 
 	public static HttpRequestFactory createRequestFactory() {
+		// work around for lost ssl connections that still get reused
+		// related? http://code.google.com/p/android/issues/detail?id=8625
+		HttpTransport transport = new ApacheHttpTransport();
 		return transport.createRequestFactory(new HttpRequestInitializer() {
 			public void initialize(HttpRequest request) {
 				GoogleHeaders headers = new GoogleHeaders();

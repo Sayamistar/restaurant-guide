@@ -1,5 +1,5 @@
 package uk.ac.aston.pyzer.restaurantguide.model;
 
-public interface IOnZoomListener {
+public interface OnZoomListener {
 	void onZoomChanged();
 }

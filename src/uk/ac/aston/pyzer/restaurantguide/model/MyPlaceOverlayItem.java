@@ -20,7 +20,6 @@ public class MyPlaceOverlayItem extends OverlayItem {
 	// because user will need to zoom more to see the place
 	public boolean placeDetailsAvailable() {
 		if (list.size() > 0) {
-			//return "There are " + (list.size() + 1) + " places.";
 			return false;
 		} else {
 			return true;
@@ -28,7 +27,7 @@ public class MyPlaceOverlayItem extends OverlayItem {
 
 	}
 
-	// add item to the group (i.e. this is not a single place anymore)
+	// add item to the group (i.e. this is not a single place item anymore)
 	public void addList(MyPlaceOverlayItem item) {
 		list.add(item);
 	}

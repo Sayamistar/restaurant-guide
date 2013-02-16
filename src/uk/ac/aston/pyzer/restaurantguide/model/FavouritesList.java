@@ -2,6 +2,11 @@ package uk.ac.aston.pyzer.restaurantguide.model;
 
 import java.util.ArrayList;
 
+/**
+ * We only need one instance of a favourites list, so this is a singleton
+ * @author Gideon
+ *
+ */
 public class FavouritesList {
 	
 	private static FavouritesList instance = null;
@@ -23,6 +28,10 @@ public class FavouritesList {
 	
 	public ArrayList<FavouritePlace> getPlaces() {
 		return items;
+	}
+	
+	public void setPlaces(ArrayList<FavouritePlace> items) {
+		FavouritesList.items = items;
 	}
 	
 }

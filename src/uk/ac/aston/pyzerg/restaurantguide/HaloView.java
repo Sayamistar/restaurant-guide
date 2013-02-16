@@ -1,14 +1,15 @@
 package uk.ac.aston.pyzerg.restaurantguide;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import uk.ac.aston.pyzer.restaurantguide.model.IOnZoomListener;
+import uk.ac.aston.pyzer.restaurantguide.model.OnZoomListener;
 import uk.ac.aston.pyzer.restaurantguide.model.MyCurrentLocationOverlay;
 import uk.ac.aston.pyzer.restaurantguide.model.MyMapView;
 import uk.ac.aston.pyzer.restaurantguide.model.MyOverlayItem;
 import uk.ac.aston.pyzer.restaurantguide.model.MyPlaceOverlayItem;
 import uk.ac.aston.pyzer.restaurantguide.model.Place;
-import uk.ac.aston.pyzer.restaurantguide.model.PlaceList;
+import uk.ac.aston.pyzer.restaurantguide.model.Place.Geometry;
 import uk.ac.aston.pyzer.restaurantguide.model.PlaceOverlay;
 import android.content.Context;
 import android.content.Intent;
@@ -23,25 +24,26 @@ import com.google.android.maps.MapController;
 import com.google.android.maps.Overlay;
 
 public class HaloView extends MySherlockMapActivity implements
-		LocationListener, IOnZoomListener {
+		LocationListener, OnZoomListener {
 
-	private static final int DEFAULT_ZOOM = 15;
-
-	private MyMapView mapView = null;
+	protected MyMapView mapView = null;
 	private Drawable myCurrentMarker = null;
 	private Drawable placeMarker = null;
 
-	private List<Overlay> mapOverlays;
+	protected List<Overlay> mapOverlays;
 
-	private PlaceOverlay placeOverlay;
+	protected PlaceOverlay placeOverlay;
 	private MyCurrentLocationOverlay myCurrentLocationOverlay;
 
 	private MapController mapController;
 
 	private LocationManager locationManager;
 
-	private PlaceList places;
+	private ArrayList<Place> places;
+	
+	private Place place;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -52,9 +54,8 @@ public class HaloView extends MySherlockMapActivity implements
 
 		mapView = (MyMapView) findViewById(R.id.halomap);
 
-		myCurrentMarker = this.getResources()
-				.getDrawable(R.drawable.my_pin_red);
-		placeMarker = this.getResources().getDrawable(R.drawable.my_pin);
+		myCurrentMarker = this.getResources().getDrawable(R.drawable.my_pin);
+		placeMarker = this.getResources().getDrawable(R.drawable.ic_launcher);
 
 		myCurrentLocationOverlay = new MyCurrentLocationOverlay(
 				myCurrentMarker, mapView);
@@ -65,13 +66,19 @@ public class HaloView extends MySherlockMapActivity implements
 		mapView.setBuiltInZoomControls(true);
 		mapView.setOnZoomListener(this);
 
-		// extract the current location and list of places from the intent
+		// extract the list of places from the intent
 		Intent i = this.getIntent();
 		Bundle extras = i.getExtras();
 		if (extras != null) {
-			this.places = (PlaceList) extras.getSerializable("placeList");
+			// if placeList is passed, then we know that we want to view
+			// a list of places, otherwise we are viewing a single one
+			this.places = (ArrayList<Place>) extras
+					.getSerializable("placeList");
+			this.place = (Place) extras.getSerializable("place");
+			if (this.place != null) { this.setTitle(place.getName()); }
 		} else {
 			this.places = null;
+			this.place = null;
 		}
 
 	}
@@ -83,7 +90,7 @@ public class HaloView extends MySherlockMapActivity implements
 			public void run() {
 				mapView.invalidate();
 				mapController.animateTo(geopoint);
-				mapController.setZoom(DEFAULT_ZOOM);
+				mapController.setZoom(Config.DEFAULT_ZOOM);
 			}
 		});
 	}
@@ -119,15 +126,27 @@ public class HaloView extends MySherlockMapActivity implements
 		GeoPoint point = null;
 		MyPlaceOverlayItem overlayitem = null;
 		placeOverlay.clear();
-
-		for (Place place : places.getResults()) {
-			point = place.getGeoPoint();
+		
+		if (place == null) { 
+			// the case when a list of places it to be viewed
+			for (Place place : places) {
+				//point = place.getGeoPoint();
+				Geometry.Location location = place.getGeometry().getLocation();
+				point = this.getGeoPoint(location.getLat(), location.getLng());
+				
+				overlayitem = new MyPlaceOverlayItem(point, place);
+				placeOverlay.addOverlay(overlayitem);
+				placeOverlay.calculateItems();
+			}
+		} else {
+			// the case when a single place is to be viewed
+			//point = place.getGeoPoint();
+			Geometry.Location location = place.getGeometry().getLocation();
+			point = this.getGeoPoint(location.getLat(), location.getLng());
 			overlayitem = new MyPlaceOverlayItem(point, place);
 			placeOverlay.addOverlay(overlayitem);
 		}
-
-		placeOverlay.calculateItems();
-
+		
 		placeOverlay.doPopulate();
 
 		if (placeOverlay.size() > 0) {
@@ -171,5 +190,12 @@ public class HaloView extends MySherlockMapActivity implements
 		if (placeOverlay != null) {
 			placeOverlay.calculateItems();
 		}
+	}
+	
+	public GeoPoint getGeoPoint(double lat, double lon) {
+		int latE6 = (int) (lat * 1e6);
+		int lonE6 = (int) (lon * 1e6);
+		return new GeoPoint(latE6, lonE6);
+
 	}
 }

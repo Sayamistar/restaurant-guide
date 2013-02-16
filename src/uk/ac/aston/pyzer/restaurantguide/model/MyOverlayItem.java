@@ -15,14 +15,9 @@ public class MyOverlayItem extends OverlayItem {
 		super(point, "", "");
 		this.name = name;
 	}
-
+	
 	public String getName() {
-		if (list.size() > 0) {
-			return "There are " + (list.size() + 1) + " places.";
-		} else {
-			return name;
-		}
-
+		return name;
 	}
 
 	public void addList(MyOverlayItem item) {
@@ -32,5 +27,4 @@ public class MyOverlayItem extends OverlayItem {
 	public ArrayList<MyOverlayItem> getList() {
 		return list;
 	}
-
 }

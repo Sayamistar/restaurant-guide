@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.android.maps.GeoPoint;
 import com.google.api.client.util.Key;
 
 public class Place implements Serializable {
@@ -241,12 +240,6 @@ public class Place implements Serializable {
 				this.lng = lng;
 			}
 
-			public GeoPoint getGeoPoint() {
-				int latE6 = (int) (getLat() * 1e6);
-				int lonE6 = (int) (getLng() * 1e6);
-				return new GeoPoint(latE6, lonE6);
-
-			}
 		}
 
 		@Key
@@ -295,13 +288,7 @@ public class Place implements Serializable {
 
 	@Override
 	public String toString() {
-		String typeList = "";
-		for (String type : types) {
-			typeList = typeList + type + " ";
-		}
-		return name + "\n" + vicinity + "\n" + typeList + "\n"
-				+ this.getGeometry().getLocation().getLat() + ", "
-				+ this.getGeometry().getLocation().getLng();
+		return name + "\n" + vicinity + "\n";
 	}
 
 	/**
@@ -415,8 +402,6 @@ public class Place implements Serializable {
 		this.formatted_phone_number = formatted_phone_number;
 	}
 
-	public GeoPoint getGeoPoint() {
-		return this.geometry.getLocation().getGeoPoint();
-	}
+
 
 }

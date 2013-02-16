@@ -7,8 +7,9 @@ import android.util.AttributeSet;
 import com.google.android.maps.MapView;
 
 public class MyMapView extends MapView {
-	int oldZoomLevel = -1;
-	IOnZoomListener onZoomListener;
+	
+	private int oldZoomLevel = -1;
+	private OnZoomListener onZoomListener;
 
 	public MyMapView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
@@ -22,10 +23,8 @@ public class MyMapView extends MapView {
 		super(context, attrs);
 	}
 
-	public void setOnZoomListener(IOnZoomListener onZoomListener) {
-
+	public void setOnZoomListener(OnZoomListener onZoomListener) {
 		this.onZoomListener = onZoomListener;
-
 	}
 
 	@Override
@@ -34,7 +33,7 @@ public class MyMapView extends MapView {
 		// get new zoom level
 		int newZoom = this.getZoomLevel();
 
-		// if the new zome is different from old
+		// if the new zoom is different from old
 		if (newZoom != oldZoomLevel) {
 			// and the map has already been zoomed before
 			if (oldZoomLevel != -1 && onZoomListener != null) {

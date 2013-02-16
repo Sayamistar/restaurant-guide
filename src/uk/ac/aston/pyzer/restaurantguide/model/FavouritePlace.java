@@ -1,10 +1,26 @@
 package uk.ac.aston.pyzer.restaurantguide.model;
 
-public class FavouritePlace {
+import java.io.Serializable;
+
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
+
+/**
+ * This is a wrapper class so that we can combine the place and the notes together
+ * into a single object to be stored in the favourites list
+ * @author Gideon
+ *
+ */
+public class FavouritePlace implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8490373818976948565L;
 	private Place place;
 	private String notes;
 	
-	public FavouritePlace(Place place, String notes) {
+	@JsonCreator
+	public FavouritePlace(@JsonProperty("place") Place place, @JsonProperty("notes") String notes) {
 		this.place = place;
 		this.notes = notes;
 	}
@@ -26,6 +42,6 @@ public class FavouritePlace {
 	}
 	
 	public String toString() {
-		return place.toString() + "\n\nNotes: " + notes;
+		return place.toString() + "\nNotes: " + notes;
 	}
 }
