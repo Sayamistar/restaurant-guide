@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-        <view class="uk.ac.aston.pyzer.restaurantguide.model.MyMapView"
+        <view class="uk.ac.aston.pyzerg.restaurantguide.model.MyMapView"
             android:id="@+id/halomap"
             android:layout_width="fill_parent"
             android:layout_height="0dip"

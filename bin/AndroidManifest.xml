@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="uk.ac.aston.pyzerg.restaurantguide"
+    package="uk.ac.aston.pyzerg.restaurantguide.ui"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -28,13 +28,20 @@
             android:name=".ViewResults"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".SelectCategory"
-            android:screenOrientation="portrait" >
+            android:name=".Splash"
+            android:screenOrientation="portrait"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".SelectCategory"
+            android:screenOrientation="portrait" >
+            
         </activity>
         <activity
             android:name=".SelectCuisines"
