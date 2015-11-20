@@ -16,7 +16,7 @@ This is a simple Android application that allows users to find restaurants in th
 2. Copy "RestaurantGuide.apk" to your phone
 3. Install it via the Package Installer
 
-## Using the source code
+### Using the source code
 1. Download the ActionBarSherlock library from http://actionbarsherlock.com/
 2. Import both restaurant-guide and the ActionBarSherlock library projects into an IDE (e.g. Eclipse, Android Studio etc.)
 3. Mark the ActionBarSherlock library as a Library (e.g. "Is Library" option ticked in Eclipse)
